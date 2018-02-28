@@ -6,11 +6,13 @@ This Java web-app is designed to run on IBM Cloud and ;
 - determine important keywords & entities referenced in the call using Watson Natural Language Understanding
 - persist call analytics data to a DB2 data store hosted on IBM Cloud 
 
-##Building from source 
+## Building from source 
 Once you check out the code from GitHub, you can build it using Maven:
-'''mvn clean install
+``` 
+mvn clean install
+```
 
-##Services to create on IBM Cloud before deployment; 
+## Services to create on IBM Cloud before deployment; 
 - IBM Cloud Object Storage
 - Speech to Text 
 - Tone Analyzer
