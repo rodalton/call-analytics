@@ -1,0 +1,14 @@
+---
+applications:
+ - name: CallAnalytics
+   services:
+   - Cloud Object Storage-de
+   - Db2 Warehouse-0d
+   - Tone Analyzer-9d
+   - Speech to Text-0o
+   - Natural Language Understanding-00
+   random-route: true
+   path: target/call-analytics-0.0.1.war
+   memory: 256M
+   instances: 1
+   buildpack: java_buildpack
