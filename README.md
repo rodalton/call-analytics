@@ -44,7 +44,7 @@ This web-app expects .wav files to be hosted in an IBM COS bucket. If required, 
 Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
 
 ### 6. Push the web-app to IBM Cloud
-Using the IBM Cloud CLI, push the web-app to IBM Cloud
+Using the IBM Cloud CLI, push the web-app to IBM Cloud. From a terminal window or command prompt, configure the CLI to use the correct API endpoint, login to IBM Cloud then push the app. 
 ```
 bx api
 bx login
