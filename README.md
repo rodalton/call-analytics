@@ -51,5 +51,5 @@ bx login
 bx cf app push
 ```
 ### 7. Open the web-app in a browser and run
-Open the web-app in a browser with the following URL APP `URL/home`
+Open the web-app in a browser with the following URL `APP URL/home`
 Select your IBM COS bucket, then click on Run
