@@ -88,7 +88,7 @@ public class BucketList extends HttpServlet {
 		String api_key; 
 		String service_instance_id;
 		String endpoint_url;
-		String location="us";
+		String location;
 		
 		if (System.getenv("VCAP_SERVICES") != null) {
 			JsonObject creds = VCAPHelper.getCloudCredentials("cloud-object-storage");
@@ -98,12 +98,15 @@ public class BucketList extends HttpServlet {
 			}
 			api_key = creds.get("apikey").getAsString();
 			service_instance_id = creds.get("resource_instance_id").getAsString();
-			endpoint_url = creds.get("endpoints").getAsString();
+			//Values not available from VCAP_SERVICES, read from props 
+			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
+			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
 		} else {
 			System.out.println("Running locally. Looking for credentials in resource.properties");
 			api_key = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_api_key");
 			service_instance_id = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_service_instance_id");
 			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
+			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
 			if(api_key == null || api_key.length()==0){
 				System.out.println("Missing COS credentials in resource.properties");
 				return null;
