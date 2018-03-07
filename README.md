@@ -1,18 +1,18 @@
-# Watson Call Analytics
-This Java web-app is designed to run on IBM Cloud and leverages services from Watson to analyse call centre recordings.
+# Call Analytics with Watson
+Our Call Analytics web-app is designed to access call recordings hosted on IBM Cloud Object Storage, transcribe these calls, then provide call insights using Watson.
 
-Services provided by this web-app;
+Services provided by our Call Analytics web-app;
 - access .wav files (call recordings) hosted in an [IBM Cloud Object Storage](https://www.ibm.com/cloud/object-storage) bucket
 - transcribe these call recordings with [Watson Speech to Text](https://www.ibm.com/watson/services/speech-to-text/)
 - analyse the transcribed call for tone with [Watson Tone Analyzer](https://www.ibm.com/watson/services/tone-analyzer/)
 - determine important keywords & entities referenced in the call using [Watson Natural Language Understanding](https://www.ibm.com/watson/services/natural-language-understanding/)
-- persist call analytics data to a DB2 data store hosted on IBM Cloud
+- persist call analytics data to a Db2 data store using [Db2 Warehouse on IBM Cloud](https://www.ibm.com/cloud/db2-warehouse-on-cloud)
 
 ### High Level Architecture
 ![alt text](https://ibm.box.com/shared/static/lgzjxw7wdy2aaz2l621csdvf5u4kgtc5.jpg "High level architecture")
 
 ## Build & deploy to IBM Cloud
-Use the following steps to build from source and deploy to IBM Cloud.
+Use the following steps to build our Call Analytics web-app from source and deploy to IBM Cloud.
 
 ### 1. Create the required IBM Cloud services
 Create an instance of each of these services on IBM Cloud;
@@ -28,17 +28,17 @@ Clone this GitHub repository to your local machine
 git clone https://github.com/rodalton/call-analytics.git
 ```
 
-If needed, open the `resource.properties` file and update the IBM Cloud Object Storage endpoint details to align with the location of your IBM COS instance.
+If needed, open the `resource.properties` file and update the IBM Cloud Object Storage endpoint details to align with the location of your IBM COS instance. See IBM Cloud Object Storage below to understand how this property is used.
 
 Build the WAR file to deploy to IBM Cloud
 ```
 mvn clean install
 ```
 ### 3. Create the db schema
-Use the SQL from the `db2.ddl` file to build a db schema. Open the Db2 Warehouse on Cloud service created earlier, open the console and use the Run SQL option to build the schema.
+Use the SQL from the `db2.ddl` file to build a db schema. Open the Db2 Warehouse on Cloud service created earlier, open the console and use the Run SQL option to build the schema. See Db2 Warehouse on IBM Cloud below for more information on our database structure.
 
 ### 4. Create an IBM COS bucket
-This web-app expects .wav files to be hosted in an IBM COS bucket. If required, create a new bucket to host your call recordings.
+Our web-app expects .wav files to be hosted in an IBM COS bucket. If required, create a new bucket to host your call recordings.
 
 ### 5. Update the manifest.yml file
 Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
@@ -54,7 +54,8 @@ bx cf app push
 Open the web-app in a browser with the following URL `APP URL/home`
 Select your IBM COS bucket, then click on Run
 
-## IBM Cloud Services
+## IBM Cloud Services & our Call Analytics web-app
+![alt text](https://ibm.box.com/shared/static/s9eg7wss3f66kk2jv8m1rnwreoizet21.jpg "Sequence Diagram")
 
 #### IBM Cloud Object Storage
 IBM Cloud Object Storage is used to host our call recordings. Our web-app uses the [IBM Cloud Object Storage Java SDK](https://github.com/IBM/ibm-cos-sdk-java) to access a bucket that hosts our calls.
