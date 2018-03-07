@@ -54,8 +54,7 @@ bx cf app push
 Open the web-app in a browser with the following URL `APP URL/home`
 Select your IBM COS bucket, then click on Run
 
-
-
+---
 ## IBM Cloud Services & our Call Analytics web-app
 ![alt text](https://ibm.box.com/shared/static/jwfhwkvs87vbw53peq6j78p98uc17xzk.png "Sequence Diagram")
 
