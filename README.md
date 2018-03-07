@@ -44,7 +44,7 @@ This web-app expects .wav files to be hosted in an IBM COS bucket. If required, 
 Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
 
 ### 6. Push the web-app to IBM Cloud
-Using the IBM Cloud CLI, push the web-app to IBM Cloud. From a terminal window or command prompt, configure the CLI to use the correct API endpoint, login to IBM Cloud then push the app. 
+Using the IBM Cloud CLI, push the web-app to IBM Cloud. From a terminal window or command prompt, configure the CLI to use the correct API endpoint, login to IBM Cloud then push the app.
 ```
 bx api
 bx login
@@ -53,3 +53,25 @@ bx cf app push
 ### 7. Open the web-app in a browser and run
 Open the web-app in a browser with the following URL `APP URL/home`
 Select your IBM COS bucket, then click on Run
+
+## IBM Cloud Services
+
+#### IBM Cloud Object Storage
+IBM Cloud Object Storage is used to host our call recordings. Our web-app uses the [IBM Cloud Object Storage Java SDK](https://github.com/IBM/ibm-cos-sdk-java) to access a bucket that hosts our calls.
+
+Call recordings are expected in .wav format.
+
+IBM Cloud Object Storage makes both regional and cross region endpoints available for connecting applications to IBM COS. The region endpoint is defined in the web-apps resource.properties file. Update the entry in this file before deploying the web-app to IBM Cloud.
+
+#### Speech to Text
+Watson Speech to Text (STT) is used to transcribe our call recordings. Our web-app uses the [Java SDK for Watson](https://github.com/watson-developer-cloud/java-sdk) when calling the STT service. We call the STT WebSockets endpoint passing our call recording to the API as an InputStream. [Speaker labels](https://console.bluemix.net/docs/services/speech-to-text/output.html#output) are applied to the response of the STT service to allow our web-app determine the utterance per speaker on the call.  
+
+#### Tone Analyzer
+Watson Tone Analyzer is used to determine the tone of each utterance on the call. As above, the STT service provides us with the utterance of each speaker, we use the [Customer Engagemement](https://console.bluemix.net/docs/services/tone-analyzer/using-tone-chat.html#using-the-customer-engagement-endpoint) of the Tone Analyzer service to provide a tone per utterance on the call.  
+
+#### Natural Language Understanding
+Watson Natural Language Understanding (NLU) is used to identify keywords and entities referenced in the call recording. Only keywords/entities with a confidence score of greater than 0.7 are persisted in the database.
+
+#### Db2 Warehouse on IBM Cloud
+Db2 Warehouse on Cloud is used to store the raw insights pulled from call recordings. Our db schema consists of just 4 tables, as follows:
+![alt text](https://ibm.box.com/shared/static/besjmwa5p5ixou2q247g51cwetyaol39.png "DB Schema")
