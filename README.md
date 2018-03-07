@@ -55,7 +55,7 @@ Open the web-app in a browser with the following URL `APP URL/home`
 Select your IBM COS bucket, then click on Run
 
 ## IBM Cloud Services & our Call Analytics web-app
-![alt text](https://ibm.box.com/shared/static/s9eg7wss3f66kk2jv8m1rnwreoizet21.jpg "Sequence Diagram")
+![alt text](https://ibm.box.com/shared/static/jwfhwkvs87vbw53peq6j78p98uc17xzk.png "Sequence Diagram")
 
 #### IBM Cloud Object Storage
 IBM Cloud Object Storage is used to host our call recordings. Our web-app uses the [IBM Cloud Object Storage Java SDK](https://github.com/IBM/ibm-cos-sdk-java) to access a bucket that hosts our calls.
