@@ -63,7 +63,7 @@ public class WatsonCallAnalytics extends HttpServlet {
 				System.out.println(" - " + objectSummary.getKey() + "  " + "(size = " + objectSummary.getSize() + ")");
 
 				//getObject(bucket name, file name)
-				S3Object returned = _s3Client.getObject("recordings", objectSummary.getKey());
+				S3Object returned = _s3Client.getObject(bucketName, objectSummary.getKey());
 				S3ObjectInputStream audio = returned.getObjectContent(); 
 				dateFormat = new SimpleDateFormat("HH:mm:ss");
 	            time =  dateFormat.format(objectSummary.getLastModified());
