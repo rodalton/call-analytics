@@ -16,17 +16,8 @@
 				src='images/newapp-icon.png'></td>
 			<td>
 				<h1>Call Analytics with Watson</h1>
-
-				<p class='description'></p> Select an IBM COS bucket: <br>
-				<form name="bucket" method="get" action="call_analytics">
-					<select name="bucket">
-						<c:forEach items="${bucketList}" var="bucket">
-							<option value="${bucket.name}">${bucket.name}</option>
-						</c:forEach>
-					</select>
-					<p></p>
-					<input type="submit" value="Run call analytics">
-				</form>
+				<p class='description'></p> Check Db2 Warehouse on IBM Cloud for
+				results. <br>
 			</td>
 		</tr>
 	</table>
