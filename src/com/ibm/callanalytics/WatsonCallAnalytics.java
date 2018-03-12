@@ -114,7 +114,7 @@ public class WatsonCallAnalytics extends HttpServlet {
 		String api_key; 
 		String service_instance_id;
 		String endpoint_url;
-		String location="us";
+		String location;
 		
 		if (System.getenv("VCAP_SERVICES") != null) {
 			JsonObject creds = VCAPHelper.getCloudCredentials("cloud-object-storage");
