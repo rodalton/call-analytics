@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -76,9 +77,9 @@ public class WatsonCallAnalytics extends HttpServlet {
 		catch(Exception e){
 			e.printStackTrace();
 		}
-
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		RequestDispatcher rd=request.getRequestDispatcher("result.jsp");  
+        rd.forward(request, response);  	    
 	}
 
 	/**
@@ -123,12 +124,14 @@ public class WatsonCallAnalytics extends HttpServlet {
 			}
 			api_key = creds.get("apikey").getAsString();
 			service_instance_id = creds.get("resource_instance_id").getAsString();
-			endpoint_url = creds.get("endpoints").getAsString();
+			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
+			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
 		} else {
 			System.out.println("Running locally. Looking for credentials in resource.properties");
 			api_key = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_api_key");
 			service_instance_id = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_service_instance_id");
 			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
+			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
 			if(api_key == null || api_key.length()==0){
 				System.out.println("Missing COS credentials in resource.properties");
 				return null;
