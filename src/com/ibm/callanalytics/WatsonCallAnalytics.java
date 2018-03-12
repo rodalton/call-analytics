@@ -48,7 +48,7 @@ public class WatsonCallAnalytics extends HttpServlet {
 		try{
 			//Passed in from html form 
 			String bucketName = request.getParameter("bucket");
-
+			
 			AmazonS3 _s3Client = createClient();
 
 			//File metadata from S3 store 
