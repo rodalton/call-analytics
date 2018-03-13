@@ -67,7 +67,6 @@ public class CallAnalyticsServlet extends HttpServlet {
 				
 				//getObject(bucket name, file name)
 				S3Object returned = _s3Client.getObject(bucketName, objectSummary.getKey());
-				S3ObjectInputStream audio = returned.getObjectContent(); 
 				
 				//Get last modified time 
 				dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -79,17 +78,20 @@ public class CallAnalyticsServlet extends HttpServlet {
 		        
 		        //Get audio file duration in seconds
 		        try { 
-		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(audio));
+		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(returned.getObjectContent()));
 		        	AudioFormat format = audioInputStream.getFormat();
 		        	long frames = audioInputStream.getFrameLength();
 		        	double durationInSeconds = (frames+0.0) / format.getFrameRate();
 		        	duration = (int)Math.round(durationInSeconds);
+		        	audioInputStream.close();
 		        }
 		        catch(Exception e) {
 		        	System.out.println("CallAnalyticsServlet: Issue getting audio file length");
 		        	e.printStackTrace();
 		        }
-		            	
+		        
+		        S3ObjectInputStream audio = returned.getObjectContent(); 
+		                   	
 				analyseCall(audio, time, date, duration);
 			}
 		}
