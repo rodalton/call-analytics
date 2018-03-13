@@ -36,7 +36,6 @@ public class VCAPHelper {
 		}
 
 		obj = (JsonObject) ((JsonArray) dbEntry.getValue()).get(0);
-		System.out.println("VCAP_SERVICES: Found " + (String) dbEntry.getKey());
 
 		return (JsonObject) obj.get("credentials");
 	}
