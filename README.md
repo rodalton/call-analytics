@@ -75,6 +75,23 @@ Watson Tone Analyzer is used to determine the tone of each utterance on the call
 Watson Natural Language Understanding (NLU) is used to identify keywords and entities referenced in the call recording. Only keywords/entities with a confidence score of greater than 0.7 are persisted in the database.
 
 ### Db2 Warehouse on IBM Cloud
-Db2 Warehouse on Cloud is used to store the raw insights pulled from call recordings. Our db schema consists of just 4 tables and is structured as follows:
+Db2 Warehouse on Cloud is used to store the raw insights gathered from call recordings. Our db schema consists of just 4 tables and is structured as follows:
 
 ![alt text](https://ibm.box.com/shared/static/besjmwa5p5ixou2q247g51cwetyaol39.png "DB Schema")
+
+The CALLS table stores; 
+- the last modified time of a call recording  
+- last modified date 
+- call duration in seconds 
+
+The UTTERANCES table stores; 
+- each speaker utterance from the call transcript
+- the tone per utterance 
+
+The KEYWORD table stores; 
+- keywords from the call transcript
+- only keywords with a confidence score greater than 0.5 are stored 
+
+The ENTITIES table stores; 
+- entities from the call transcript
+- only entities with a confidence score greater than 0.5 are stored  
