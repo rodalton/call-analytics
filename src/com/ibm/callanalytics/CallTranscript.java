@@ -21,6 +21,7 @@ public class CallTranscript {
 		this.date = date; 
 	}
 	
+	//Update to use different models & file formats
 	public void getTranscript(InputStream audio) {
 			
 		SpeechToText service = getSTT();
@@ -64,17 +65,16 @@ public class CallTranscript {
 		if (System.getenv("VCAP_SERVICES") != null) {
 			JsonObject sttCreds = VCAPHelper.getCloudCredentials("speech_to_text");
 			if(sttCreds == null){
-				System.out.println("No Speech to Text service bound to this application");
+				System.out.println("No STT service bound to this application");
 				return null;
 			}
 			username = sttCreds.get("username").getAsString();
 			password = sttCreds.get("password").getAsString();
 		} else {
-			System.out.println("Running locally. Looking for credentials in resource.properties");
 			username = VCAPHelper.getLocalProperties("resource.properties").getProperty("stt_username");
 			password = VCAPHelper.getLocalProperties("resource.properties").getProperty("stt_password");
 			if(username == null || username.length()==0){
-				System.out.println("Missing Speech to Text credentials in resource.properties");
+				System.out.println("Missing STT credentials in resource.properties");
 				return null;
 			}
 		}

@@ -25,7 +25,7 @@ public class VCAPHelper {
 		
 		// Look for the VCAP key that holds the service info
 		for (Entry<String, JsonElement> eachEntry : entries) {
-			if (eachEntry.getKey().toLowerCase().contains(serviceName)) {
+			if (eachEntry.getKey().contains(serviceName)) {
 				dbEntry = eachEntry;
 				break;
 			}

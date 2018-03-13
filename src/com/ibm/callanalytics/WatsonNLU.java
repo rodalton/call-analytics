@@ -28,6 +28,8 @@ public class WatsonNLU {
 
 		NaturalLanguageUnderstanding service = getNLU();
 
+		System.out.println("WatsonNLU: Calling NLU for Call ID: " + call_id);
+		
 		EntitiesOptions entitiesOptions = new EntitiesOptions.Builder()
 				.emotion(true)
 				.sentiment(true)
@@ -56,16 +58,24 @@ public class WatsonNLU {
 	
 		//Insert keywords into the db 
 		List<KeywordsResult> keywords = response.getKeywords();
-		insertKeywords(keywords, call_id);
+		if (keywords.size() > 0) {
+			System.out.println("WatsonNLU: Persist keywords from NLU response");
+			insertKeywords(keywords, call_id);			
+		}
+
 		
 		//Insert entities into the db 
 		List<EntitiesResult> entities = response.getEntities();
-		insertEntities(entities, call_id);		
+		if (entities.size() > 0) {
+			System.out.println("WatsonNLU: Persist entities from NLU response");
+			insertEntities(entities, call_id);			
+		}
 	}
 	
 	private void insertKeywords(List<KeywordsResult> keywords, int call_id){
-		//Only persist relevant keywords 
+		
 		for (int i=0; i<keywords.size(); i++){ 
+			//Only persist relevant keywords 
 			if(keywords.get(i).getRelevance() > 0.5){ 
 				dbManager.connect();
 	            dbManager.insertKeywords(keywords.get(i).getText(), call_id);
@@ -74,8 +84,9 @@ public class WatsonNLU {
 	}
 	
 	private void insertEntities(List<EntitiesResult> entities, int call_id){
-		//Only persist relevant entities  
+		 
 		for (int i=0; i<entities.size(); i++){ 
+			//Only persist relevant entities 
 			if(entities.get(i).getRelevance() > 0.5){ 
 				dbManager.connect();
 	            dbManager.insertKeywords(entities.get(i).getText(), call_id);
@@ -90,17 +101,16 @@ public class WatsonNLU {
 		if (System.getenv("VCAP_SERVICES") != null) {
 			JsonObject creds = VCAPHelper.getCloudCredentials("natural-language-understanding");
 			if(creds == null){
-				System.out.println("No Natural Language Understanding service bound to this application");
+				System.out.println("No NLU service bound to this application");
 				return null;
 			}
 			username = creds.get("username").getAsString();
 			password = creds.get("password").getAsString();
 		} else {
-			System.out.println("Running locally. Looking for credentials in resource.properties");
 			username = VCAPHelper.getLocalProperties("resource.properties").getProperty("nlu_username");
 			password = VCAPHelper.getLocalProperties("resource.properties").getProperty("nlu_password");
 			if(username == null || username.length()==0){
-				System.out.println("Missing Speech to Text credentials in resource.properties");
+				System.out.println("Missing NLU credentials in resource.properties");
 				return null;
 			}
 		}

@@ -1,9 +1,11 @@
 package com.ibm.callanalytics;
 
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.text.SimpleDateFormat;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,41 +21,66 @@ import com.ibm.cloud.objectstorage.client.builder.AwsClientBuilder.EndpointConfi
 import com.ibm.cloud.objectstorage.oauth.BasicIBMOAuthCredentials;
 import com.ibm.cloud.objectstorage.services.s3.AmazonS3;
 import com.ibm.cloud.objectstorage.services.s3.AmazonS3ClientBuilder;
-import com.ibm.cloud.objectstorage.services.s3.model.Bucket;
+import com.ibm.cloud.objectstorage.services.s3.model.ListObjectsRequest;
+import com.ibm.cloud.objectstorage.services.s3.model.ObjectListing;
+import com.ibm.cloud.objectstorage.services.s3.model.S3Object;
+import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectInputStream;
+import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
 
 /**
- * Servlet implementation class BucketList
+ * Servlet implementation class CallTranscript
  */
-@WebServlet("/home")
-public class BucketList extends HttpServlet {
+@WebServlet("/call_analytics")
+public class CallAnalyticsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public BucketList() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+
+	/**
+	 * Default constructor. 
+	 */
+	public CallAnalyticsServlet() {
+
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{
-			AmazonS3 _s3Client = createClient();
-			List<Bucket> bucketList = _s3Client.listBuckets();
+			//Passed in from html form 
+			String bucketName = request.getParameter("bucket");
 			
-			request.setAttribute("bucketList", bucketList);
-	        request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+			AmazonS3 _s3Client = createClient();
 
+			//File metadata from S3 store 
+			String time; 
+			String date; 
+            SimpleDateFormat dateFormat; 
+			
+			//Get each file in the bucket & create an inputstream for each file 
+			ObjectListing objectListing = _s3Client.listObjects(new ListObjectsRequest().withBucketName(bucketName));
+
+			for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
+				System.out.println("CallAnalyticsServlet: Reading " + objectSummary.getKey() + " from IBM COS");
+				
+				//getObject(bucket name, file name)
+				S3Object returned = _s3Client.getObject(bucketName, objectSummary.getKey());
+				S3ObjectInputStream audio = returned.getObjectContent(); 
+				
+				dateFormat = new SimpleDateFormat("HH:mm:ss");
+	            time =  dateFormat.format(objectSummary.getLastModified());
+	            
+				dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		        date = dateFormat.format(objectSummary.getLastModified());
+		            	            
+				analyseCall(audio, time, date);
+			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			e.printStackTrace(response.getWriter());
 		}
-
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		RequestDispatcher rd=request.getRequestDispatcher("result.jsp");  
+        rd.forward(request, response);  	    
 	}
 
 	/**
@@ -72,19 +99,7 @@ public class BucketList extends HttpServlet {
 		callTranscript.getTranscript(audio);
 	}
 
-	/**
-	 * @param bucketName
-	 * @param clientNum
-	 * @param api_key
-	 *            (or access key)
-	 * @param service_instance_id
-	 *            (or secret key)
-	 * @param endpoint_url
-	 * @param location
-	 * @return AmazonS3
-	 */
 	public static AmazonS3 createClient(){
-		
 		String api_key; 
 		String service_instance_id;
 		String endpoint_url;
@@ -98,7 +113,6 @@ public class BucketList extends HttpServlet {
 			}
 			api_key = creds.get("apikey").getAsString();
 			service_instance_id = creds.get("resource_instance_id").getAsString();
-			//Values not available from VCAP_SERVICES, read from props 
 			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
 			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
 		} else {

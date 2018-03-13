@@ -36,6 +36,8 @@ public class WatsonTone {
         }
         
         //Call Watson Tone Analyzer & insert into db 
+        System.out.println("WatsonTone: Calling Tone Analyzer for Call ID: " + call_id);
+        
         ToneAnalyzer service = getToneAnalyser();
         ToneChatOptions options = new ToneChatOptions.Builder()
           .utterances(watsonUtterances).build();
@@ -90,11 +92,10 @@ public class WatsonTone {
 			username = creds.get("username").getAsString();
 			password = creds.get("password").getAsString();
 		} else {
-			System.out.println("Running locally. Looking for credentials in resource.properties");
 			username = VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_username");
 			password = VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_password");
 			if(username == null || username.length()==0){
-				System.out.println("Missing Speech to Text credentials in resource.properties");
+				System.out.println("Missing Tone Analyzer credentials in resource.properties");
 				return null;
 			}
 		}

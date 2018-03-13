@@ -25,7 +25,7 @@ public class ManageDB {
 				if (System.getenv("VCAP_SERVICES") != null) {
 					JsonObject creds = VCAPHelper.getCloudCredentials("dashDB");
 					if(creds == null){
-						System.out.println("No Natural Language Understanding service bound to this application");
+						System.out.println("No Db2 Warehouse on Cloud service bound to this application");
 						return null;
 					}
 					username = creds.get("username").getAsString();
