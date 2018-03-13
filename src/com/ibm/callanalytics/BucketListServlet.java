@@ -1,7 +1,6 @@
 package com.ibm.callanalytics;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -58,14 +57,6 @@ public class BucketListServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
-	}
-
-	public void analyseCall(InputStream audio, String time, String date){		
-		CallData callData = new CallData(time, date, 1); 
-		int call_id = callData.addCall();
-		
-		CallTranscript callTranscript = new CallTranscript(call_id, time, date); 
-		callTranscript.getTranscript(audio);
 	}
 
 	public static AmazonS3 createClient(){

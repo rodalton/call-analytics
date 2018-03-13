@@ -11,14 +11,10 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.BaseRecognizeC
 
 public class CallTranscript {
 	
-	int call_id; 
-	String time; 
-	String date; 
+	int call_id;  
 	
-	public CallTranscript(int call_id, String time, String date){
+	public CallTranscript(int call_id){
 		this.call_id = call_id; 
-		this.time = time; 
-		this.date = date; 
 	}
 	
 	//Update to use different models & file formats

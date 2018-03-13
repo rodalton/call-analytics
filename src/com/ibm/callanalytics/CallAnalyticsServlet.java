@@ -1,6 +1,7 @@
 package com.ibm.callanalytics;
 
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 import com.google.gson.JsonObject;
 import com.ibm.cloud.objectstorage.ClientConfiguration;
@@ -34,9 +38,7 @@ import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
 public class CallAnalyticsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Default constructor. 
-	 */
+
 	public CallAnalyticsServlet() {
 
 	}
@@ -54,6 +56,7 @@ public class CallAnalyticsServlet extends HttpServlet {
 			//File metadata from S3 store 
 			String time; 
 			String date; 
+			int duration = 0; 
             SimpleDateFormat dateFormat; 
 			
 			//Get each file in the bucket & create an inputstream for each file 
@@ -66,13 +69,28 @@ public class CallAnalyticsServlet extends HttpServlet {
 				S3Object returned = _s3Client.getObject(bucketName, objectSummary.getKey());
 				S3ObjectInputStream audio = returned.getObjectContent(); 
 				
+				//Get last modified time 
 				dateFormat = new SimpleDateFormat("HH:mm:ss");
 	            time =  dateFormat.format(objectSummary.getLastModified());
 	            
+	            //Get last modified date 
 				dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		        date = dateFormat.format(objectSummary.getLastModified());
-		            	            
-				analyseCall(audio, time, date);
+		        
+		        //Get audio file duration in seconds
+		        try { 
+		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(audio));
+		        	AudioFormat format = audioInputStream.getFormat();
+		        	long frames = audioInputStream.getFrameLength();
+		        	double durationInSeconds = (frames+0.0) / format.getFrameRate();
+		        	duration = (int)Math.round(durationInSeconds);
+		        }
+		        catch(Exception e) {
+		        	System.out.println("CallAnalyticsServlet: Issue getting audio file length");
+		        	e.printStackTrace();
+		        }
+		            	
+				analyseCall(audio, time, date, duration);
 			}
 		}
 		catch(Exception e){
@@ -90,12 +108,12 @@ public class CallAnalyticsServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
-	public void analyseCall(InputStream audio, String time, String date){		
-		CallData callData = new CallData(time, date, 1); 
+	
+	public void analyseCall(InputStream audio, String time, String date, int duration){		
+		CallData callData = new CallData(time, date, duration); 
 		int call_id = callData.addCall();
 		
-		CallTranscript callTranscript = new CallTranscript(call_id, time, date); 
+		CallTranscript callTranscript = new CallTranscript(call_id); 
 		callTranscript.getTranscript(audio);
 	}
 
