@@ -2,6 +2,8 @@ package com.ibm.callanalytics;
 
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -76,9 +78,18 @@ public class CallAnalyticsServlet extends HttpServlet {
 				dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		        date = dateFormat.format(objectSummary.getLastModified());
 		        
+		        //Drain the inputstream into a byte[]
+		        //https://stackoverflow.com/questions/7805266/how-can-i-reopen-a-closed-inputstream-when-i-need-to-use-it-2-times
+		        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		        byte[] buf = new byte[1024];
+		        int n = 0;
+		        while ((n = returned.getObjectContent().read(buf)) >= 0)
+		            baos.write(buf, 0, n);
+		        byte[] content = baos.toByteArray();
+		        		        
 		        //Get audio file duration in seconds
 		        try { 
-		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(returned.getObjectContent()));
+		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new ByteArrayInputStream(content)));
 		        	AudioFormat format = audioInputStream.getFormat();
 		        	long frames = audioInputStream.getFrameLength();
 		        	double durationInSeconds = (frames+0.0) / format.getFrameRate();
@@ -90,9 +101,9 @@ public class CallAnalyticsServlet extends HttpServlet {
 		        	e.printStackTrace();
 		        }
 		        
-		        S3ObjectInputStream audio = returned.getObjectContent(); 
+		        //S3ObjectInputStream audio = returned.getObjectContent(); 
 		                   	
-				analyseCall(audio, time, date, duration);
+				analyseCall(new ByteArrayInputStream(content), time, date, duration);
 			}
 		}
 		catch(Exception e){
