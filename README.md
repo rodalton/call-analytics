@@ -17,6 +17,7 @@ Use the following steps to build our Call Analytics web-app from source and depl
 ### 1. Create the required IBM Cloud services
 Create an instance of each of these services on IBM Cloud;
 - IBM Cloud Object Storage
+    - Create a bucket to store files and note the associated endpoint URL
 - Speech to Text
 - Tone Analyzer
 - Natural Language Classifier
