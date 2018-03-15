@@ -59,6 +59,10 @@ public class WatsonTone {
         String speaker = "";
         
     	ManageDB dbManager = new ManageDB();
+    	
+    	if(utteranceArray.size() > 0){
+    		System.out.println("WatsonTone: Persist utterance tone for Call ID: " + call_id);
+    	}
         
         //Use this to insert into the UTTERANCES table 
     	for (int i=0; i<utteranceArray.size(); i++) { 
