@@ -49,7 +49,7 @@ Using the IBM Cloud CLI, push the web-app to IBM Cloud. From a terminal window o
 ```
 bx api
 bx login
-bx cf app push
+bx app push
 ```
 ### 7. Open the web-app in a browser and run
 Open the web-app in a browser with the following URL `APP URL/home`
