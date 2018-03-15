@@ -2,6 +2,7 @@ package com.ibm.callanalytics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,9 +14,15 @@ import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.UtteranceAnalyses;
 
 public class WatsonTone {
 	
+	ToneAnalyzer service; 
+	
+	public WatsonTone() {
+		service = getToneAnalyser();
+	}
+	
 	public void callToneAnalyzer(String transcript, int call_id) {
         JsonParser jParser = new JsonParser();
-        JsonArray jArray =   (JsonArray) jParser.parse(transcript) ;
+        JsonArray jArray = (JsonArray) jParser.parse(transcript) ;
         
         //Block below is to get customer engagement tone
         //See here https://www.ibm.com/watson/developercloud/tone-analyzer/api/v3/#customer-tone
@@ -38,7 +45,6 @@ public class WatsonTone {
         //Call Watson Tone Analyzer & insert into db 
         System.out.println("WatsonTone: Calling Tone Analyzer for Call ID: " + call_id);
         
-        ToneAnalyzer service = getToneAnalyser();
         ToneChatOptions options = new ToneChatOptions.Builder()
           .utterances(watsonUtterances).build();
         UtteranceAnalyses tones = service.toneChat(options).execute();         
@@ -80,27 +86,11 @@ public class WatsonTone {
 	}
 	
 	private ToneAnalyzer getToneAnalyser(){
-		String username; 
-		String password; 
+		Map<String, String> credentials = VCAPHelper.getToneAnalyzerCreds();
+		String username = credentials.get("username").toString(); 
+		String password = credentials.get("password").toString(); 
 		
-		if (System.getenv("VCAP_SERVICES") != null) {
-			JsonObject creds = VCAPHelper.getCloudCredentials("tone_analyzer");
-			if(creds == null){
-				System.out.println("No Tone Analyzer service bound to this application");
-				return null;
-			}
-			username = creds.get("username").getAsString();
-			password = creds.get("password").getAsString();
-		} else {
-			username = VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_username");
-			password = VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_password");
-			if(username == null || username.length()==0){
-				System.out.println("Missing Tone Analyzer credentials in resource.properties");
-				return null;
-			}
-		}
-		
-        ToneAnalyzer service = new ToneAnalyzer("2017-09-21");
+        service = new ToneAnalyzer("2017-09-21");
         service.setUsernameAndPassword(username, password);
 		
 		return service; 

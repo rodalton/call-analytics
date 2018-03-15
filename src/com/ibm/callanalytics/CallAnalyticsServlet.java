@@ -1,12 +1,12 @@
 package com.ibm.callanalytics;
 
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -18,7 +18,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-import com.google.gson.JsonObject;
 import com.ibm.cloud.objectstorage.ClientConfiguration;
 import com.ibm.cloud.objectstorage.auth.AWSCredentials;
 import com.ibm.cloud.objectstorage.auth.AWSStaticCredentialsProvider;
@@ -30,7 +29,6 @@ import com.ibm.cloud.objectstorage.services.s3.AmazonS3ClientBuilder;
 import com.ibm.cloud.objectstorage.services.s3.model.ListObjectsRequest;
 import com.ibm.cloud.objectstorage.services.s3.model.ObjectListing;
 import com.ibm.cloud.objectstorage.services.s3.model.S3Object;
-import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectInputStream;
 import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
 
 /**
@@ -52,62 +50,68 @@ public class CallAnalyticsServlet extends HttpServlet {
 		try{
 			//Passed in from html form 
 			String bucketName = request.getParameter("bucket");
+			System.out.println("CallAnalyticsServlet: Reading files from IBM COS bucket: " + bucketName);
 			
-			AmazonS3 _s3Client = createClient();
+			AmazonS3 cos = createClient();
 
-			//File metadata from S3 store 
+			//File metadata
 			String time; 
 			String date; 
 			int duration = 0; 
+			
             SimpleDateFormat dateFormat; 
 			
-			//Get each file in the bucket & create an inputstream for each file 
-			ObjectListing objectListing = _s3Client.listObjects(new ListObjectsRequest().withBucketName(bucketName));
+			//Get each file in the bucket & create an input stream for each file 
+			ObjectListing objectListing = cos.listObjects(new ListObjectsRequest().withBucketName(bucketName));
 
-			for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
-				System.out.println("CallAnalyticsServlet: Reading " + objectSummary.getKey() + " from IBM COS");
-				
-				//getObject(bucket name, file name)
-				S3Object returned = _s3Client.getObject(bucketName, objectSummary.getKey());
-				
-				//Get last modified time 
-				dateFormat = new SimpleDateFormat("HH:mm:ss");
-	            time =  dateFormat.format(objectSummary.getLastModified());
-	            
-	            //Get last modified date 
-				dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		        date = dateFormat.format(objectSummary.getLastModified());
-		        
-		        //Drain the inputstream into a byte[]
-		        //https://stackoverflow.com/questions/7805266/how-can-i-reopen-a-closed-inputstream-when-i-need-to-use-it-2-times
-		        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		        byte[] buf = new byte[1024];
-		        int n = 0;
-		        while ((n = returned.getObjectContent().read(buf)) >= 0)
-		            baos.write(buf, 0, n);
-		        byte[] content = baos.toByteArray();
-		        		        
-		        //Get audio file duration in seconds
-		        try { 
-		        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new ByteArrayInputStream(content)));
-		        	AudioFormat format = audioInputStream.getFormat();
-		        	long frames = audioInputStream.getFrameLength();
-		        	double durationInSeconds = (frames+0.0) / format.getFrameRate();
-		        	duration = (int)Math.round(durationInSeconds);
-		        	audioInputStream.close();
-		        }
-		        catch(Exception e) {
-		        	System.out.println("CallAnalyticsServlet: Issue getting audio file length");
-		        	e.printStackTrace();
-		        }
-		        
-		        //S3ObjectInputStream audio = returned.getObjectContent(); 
-		                   	
-				analyseCall(new ByteArrayInputStream(content), time, date, duration);
+			//No point going any further if there's no IBM COS files 
+			if(objectListing.getObjectSummaries().size() == 0){
+				System.out.println("CallAnalyticsServlet: No files returned from IBM COS");
+			}
+			else{ 
+				for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
+					System.out.println("CallAnalyticsServlet: Reading " + objectSummary.getKey() + " from IBM COS");
+					
+					//getObject(bucket name, file name)
+					S3Object returned = cos.getObject(bucketName, objectSummary.getKey());
+					
+					//Get last modified time 
+					dateFormat = new SimpleDateFormat("HH:mm:ss");
+		            time =  dateFormat.format(objectSummary.getLastModified());
+		            
+		            //Get last modified date 
+					dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			        date = dateFormat.format(objectSummary.getLastModified());
+			        
+			        //Drain the inputstream into a byte[]
+			        //https://stackoverflow.com/questions/7805266/how-can-i-reopen-a-closed-inputstream-when-i-need-to-use-it-2-times
+			        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			        byte[] buf = new byte[1024];
+			        int n = 0;
+			        while ((n = returned.getObjectContent().read(buf)) >= 0)
+			            baos.write(buf, 0, n);
+			        byte[] content = baos.toByteArray();
+			        		        
+			        //Get audio file duration in seconds
+			        try { 
+			        	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new ByteArrayInputStream(content)));
+			        	AudioFormat format = audioInputStream.getFormat();
+			        	long frames = audioInputStream.getFrameLength();
+			        	double durationInSeconds = (frames+0.0) / format.getFrameRate();
+			        	duration = (int)Math.round(durationInSeconds);
+			        	audioInputStream.close();
+			        }
+			        catch(Exception e) {
+			        	System.out.println("CallAnalyticsServlet: Issue getting audio file length");
+			        	e.printStackTrace();
+			        }     
+			        
+					analyseCall(new ByteArrayInputStream(content), time, date, duration);
+				}
 			}
 		}
 		catch(Exception e){
-			e.printStackTrace(response.getWriter());
+			e.printStackTrace();
 		}
 		
 		RequestDispatcher rd=request.getRequestDispatcher("result.jsp");  
@@ -131,32 +135,12 @@ public class CallAnalyticsServlet extends HttpServlet {
 	}
 
 	public static AmazonS3 createClient(){
-		String api_key; 
-		String service_instance_id;
-		String endpoint_url;
-		String location;
-		
-		if (System.getenv("VCAP_SERVICES") != null) {
-			JsonObject creds = VCAPHelper.getCloudCredentials("cloud-object-storage");
-			if(creds == null){
-				System.out.println("No COS service bound to this application");
-				return null;
-			}
-			api_key = creds.get("apikey").getAsString();
-			service_instance_id = creds.get("resource_instance_id").getAsString();
-			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
-			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
-		} else {
-			System.out.println("Running locally. Looking for credentials in resource.properties");
-			api_key = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_api_key");
-			service_instance_id = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_service_instance_id");
-			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
-			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
-			if(api_key == null || api_key.length()==0){
-				System.out.println("Missing COS credentials in resource.properties");
-				return null;
-			}
-		}
+		//Get credentials & connection info from VCAPHelper
+		Map<String, String> cosCreds = VCAPHelper.getCOSCreds();
+		String api_key = cosCreds.get("apikey").toString();
+		String service_instance_id = cosCreds.get("resource_instance_id").toString();
+		String endpoint_url = cosCreds.get("cos_endpoint_url").toString();
+		String location = cosCreds.get("cos_endpoint_location").toString();
 	
 		AWSCredentials credentials;
 		if (endpoint_url.contains("objectstorage.softlayer.net")) {

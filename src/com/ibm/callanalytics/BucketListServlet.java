@@ -2,6 +2,7 @@ package com.ibm.callanalytics;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.JsonObject;
 import com.ibm.cloud.objectstorage.ClientConfiguration;
 import com.ibm.cloud.objectstorage.auth.AWSCredentials;
 import com.ibm.cloud.objectstorage.auth.AWSStaticCredentialsProvider;
@@ -39,12 +39,11 @@ public class BucketListServlet extends HttpServlet {
 	 */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{
-			AmazonS3 _s3Client = createClient();
-			List<Bucket> bucketList = _s3Client.listBuckets();
+			AmazonS3 cos = createClient();
+			List<Bucket> bucketList = cos.listBuckets();
 			
 			request.setAttribute("bucketList", bucketList);
 	        request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
-
 		}
 		catch(Exception e){
 			e.printStackTrace(response.getWriter());
@@ -61,33 +60,13 @@ public class BucketListServlet extends HttpServlet {
 
 	public static AmazonS3 createClient(){
 		
-		String api_key; 
-		String service_instance_id;
-		String endpoint_url;
-		String location;
+		//Get credentials & connection info from VCAPHelper
+		Map<String, String> cosCreds = VCAPHelper.getCOSCreds();
+		String api_key = cosCreds.get("apikey").toString();
+		String service_instance_id = cosCreds.get("resource_instance_id").toString();
+		String endpoint_url = cosCreds.get("cos_endpoint_url").toString();
+		String location = cosCreds.get("cos_endpoint_location").toString();
 		
-		if (System.getenv("VCAP_SERVICES") != null) {
-			JsonObject creds = VCAPHelper.getCloudCredentials("cloud-object-storage");
-			if(creds == null){
-				System.out.println("No COS service bound to this application");
-				return null;
-			}
-			api_key = creds.get("apikey").getAsString();
-			service_instance_id = creds.get("resource_instance_id").getAsString();
-			//Values not available from VCAP_SERVICES, read from props 
-			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
-			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
-		} else {
-			api_key = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_api_key");
-			service_instance_id = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_service_instance_id");
-			endpoint_url = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_url");
-			location = VCAPHelper.getLocalProperties("resource.properties").getProperty("cos_endpoint_location");
-			if(api_key == null || api_key.length()==0){
-				System.out.println("Missing COS credentials in resource.properties");
-				return null;
-			}
-		}
-	
 		AWSCredentials credentials;
 		if (endpoint_url.contains("objectstorage.softlayer.net")) {
 			credentials = new BasicIBMOAuthCredentials(api_key, service_instance_id);

@@ -6,49 +6,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import com.google.gson.JsonObject;
+import java.util.Map;
 
 public class ManageDB {
 
 	Connection conn = null; 
 	ResultSet rs = null; 
+	String username; 
+	String password; 
+	String url; 
+	
+	public ManageDB(){
+		//Get dashDB credentials & connection info 
+		Map<String, String> credentials = VCAPHelper.getDbCreds();
+		username = credentials.get("username").toString(); 
+		password = credentials.get("password").toString(); 
+		url = credentials.get("jdbcurl").toString();
+	}
 
 	public Connection connect() {
 		try{
 			String myDriver = "com.ibm.db2.jcc.DB2Driver";
-			
-			String username; 
-			String password; 
-			String url = null; 
 				
-				if (System.getenv("VCAP_SERVICES") != null) {
-					JsonObject creds = VCAPHelper.getCloudCredentials("dashDB");
-					if(creds == null){
-						System.out.println("No Db2 Warehouse on Cloud service bound to this application");
-						return null;
-					}
-					username = creds.get("username").getAsString();
-					password = creds.get("password").getAsString();
-					url = creds.get("jdbcurl").getAsString();
-				} else {
-					System.out.println("Running locally. Looking for credentials in resource.properties");
-					username = VCAPHelper.getLocalProperties("resource.properties").getProperty("db_username");
-					password = VCAPHelper.getLocalProperties("resource.properties").getProperty("db_password");
-					url = VCAPHelper.getLocalProperties("resource.properties").getProperty("jdbcurl");
-					if(username == null || username.length()==0){
-						System.out.println("Missing Speech to Text credentials in resource.properties");
-						return null;
-					}
-				}
-				
-				Class.forName(myDriver);
-				conn = DriverManager.getConnection(url, username, password);			
-			
+			Class.forName(myDriver);
+			conn = DriverManager.getConnection(url, username, password);			
 		}
 		catch (Exception e) {
-			System.err.println("Got an exception!");
-			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}        
 		return conn;
 	}
