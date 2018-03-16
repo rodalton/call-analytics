@@ -9,59 +9,71 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.BaseRecognizeCallback;
 
 public class CallTranscript {
-	
+
 	int call_id;  
-	SpeechToText service;
-	
+	SpeechToText speechToTextService;
+
 	public CallTranscript(int call_id){
 		this.call_id = call_id; 
-		service = getSTT();
+		speechToTextService = getSTT();
 	}
-	
+
 	//Update to use different models & file formats
 	public void getTranscript(InputStream audio) {
-			
+
 		RecognizeOptions options = new RecognizeOptions.Builder()
 				.model("en-US_BroadbandModel").contentType("audio/wav")
 				.speakerLabels(true).build();
 
-		BaseRecognizeCallback callback = new BaseRecognizeCallback() {
+		//New thread per audio file to be transcribed 
+		new Thread(new Runnable() {
 			@Override
-			public void onTranscription(SpeechResults speechResults) {
-			
-				WatsonNLU watsonNLU = new WatsonNLU();
-				watsonNLU.callNLU(speechResults, call_id);
-				
-			    SpeakerLabels.RecoTokens recoTokens = new SpeakerLabels.RecoTokens();
-				recoTokens.add(speechResults);
-				
-				String transcriptWithSpeakers = recoTokens.getTranscriptWithSpeakers();
-				WatsonTone watsonTone = new WatsonTone();
-				watsonTone.callToneAnalyzer(transcriptWithSpeakers, call_id);
-			}
+			public void run() {
+				try {
+					speechToTextService.recognizeUsingWebSocket(audio, options,
+							new BaseRecognizeCallback() {
+						@Override
+						public void onTranscription(SpeechResults speechResults) {
+							try {
+								WatsonNLU watsonNLU = new WatsonNLU();
+								watsonNLU.callNLU(speechResults, call_id);
 
-			@Override
-			public void onDisconnected() {
-				//System.exit(0);
-			}
-		};
+								SpeakerLabels.RecoTokens recoTokens = new SpeakerLabels.RecoTokens();
+								recoTokens.add(speechResults);
 
-		try {
-			service.recognizeUsingWebSocket(audio, options, callback);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+								String transcriptWithSpeakers = recoTokens.getTranscriptWithSpeakers();
+								WatsonTone watsonTone = new WatsonTone();
+								watsonTone.callToneAnalyzer(transcriptWithSpeakers, call_id);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+
+						@Override
+						public void onError(Exception e) {
+							e.printStackTrace();
+						}
+
+						@Override
+						public void onDisconnected() {
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
-	
+
+
 	private SpeechToText getSTT(){
 		Map<String, String> credentials = VCAPHelper.getSTTCreds();
 		String username = credentials.get("username").toString(); 
 		String password = credentials.get("password").toString(); 
-		
-		service = new SpeechToText();
-		service.setUsernameAndPassword(username, password);
-		
-		return service; 
+
+		speechToTextService = new SpeechToText();
+		speechToTextService.setUsernameAndPassword(username, password);
+
+		return speechToTextService; 
 	}
 }
