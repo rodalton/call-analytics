@@ -20,7 +20,7 @@ Create an instance of each of these services on IBM Cloud;
     - Create a bucket to store files and note the associated endpoint URL
 - Speech to Text
 - Tone Analyzer
-- Natural Language Classifier
+- Natural Language Understanding
 - Db2 Warehouse on Cloud
 
 ### 2. Build from source
