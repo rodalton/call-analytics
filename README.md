@@ -38,9 +38,17 @@ mvn clean install
 ### 3. Create the db schema
 Use the SQL from the `db2.ddl` file to build a db schema. Open the Db2 Warehouse on Cloud service created earlier, open the console and use the Run SQL option to build the schema. See Db2 Warehouse on IBM Cloud below for more information on our database structure.
 
-### 4. Create an IBM COS bucket
-Our web-app expects .wav files to be hosted in an IBM COS bucket. If required, create a new bucket to host your call recordings.
+### 4. Create an IBM COS alias
+An IBM COS instance is global and Cloud Foundry apps require a regional alias for an IBM COS service before a CF app can bind to the service. In order to bind our IBM COS service to our web-app, we'll first create a regional alias for our IBM COS service.
 
+From a terminal window, issue the following command
+```
+bx resource service-alias-create ALIAS_NAME --instance-name NAME
+``` 
+
+Replace ALIAS_NAME with your preferred alias name (this can be the same as the current service name). 
+Replace NAME in the command above with the name of the IBM COS instance created in step 1 above.
+ 
 ### 5. Update the manifest.yml file
 Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
 
