@@ -15,9 +15,7 @@ Services provided by our Call Analytics web-app;
 Use the following steps to build our Call Analytics web-app from source and deploy to IBM Cloud.
 
 ---
-**NOTE**
-
-The following software should be installed and available for use before proceeding: 
+**Note** The following software should be installed and available for use before proceeding: 
 - Git, see install instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 - Maven, see install instructions here: https://maven.apache.org/install.html
 - IBM Cloud CLI, see install instructions here: https://console.bluemix.net/docs/cli/reference/bluemix_cli/download_cli.html#download_install
