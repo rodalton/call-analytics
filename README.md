@@ -15,7 +15,7 @@ Services provided by our Call Analytics web-app;
 Use the following steps to build our Call Analytics web-app from source and deploy to IBM Cloud.
 
 ---
-**Note** The following software should be installed and available for use before proceeding: 
+**Note:** The following software should be installed and available for use before proceeding: 
 - Git, see install instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 - Maven, see install instructions here: https://maven.apache.org/install.html
 - IBM Cloud CLI, see install instructions here: https://console.bluemix.net/docs/cli/reference/bluemix_cli/download_cli.html#download_install
@@ -23,31 +23,37 @@ Use the following steps to build our Call Analytics web-app from source and depl
 ---
 
 ### 1. Create the required IBM Cloud services
-Create an instance of each of these services on IBM Cloud;
-- IBM Cloud Object Storage
-    - Create a bucket to store files and note the associated endpoint URL
+1.1 Create an instance of each of the following services on IBM Cloud. From the IBM Cloud Catalog create: 
 - Speech to Text
 - Tone Analyzer
 - Natural Language Understanding
 - Db2 Warehouse on Cloud
+- IBM Cloud Object Storage
+	- Note: also create an IBM COS bucket to store call recordings (.wav files) and note the associated endpoint URL
 
 ### 2. Build from source
-Clone this GitHub repository to your local machine
+2.1 Clone this GitHub repository to your local machine. Open a terminal window and issue the following command: 
 ```
 git clone https://github.com/rodalton/call-analytics.git
 ```
 
-If needed, open the `resource.properties` file and update the IBM Cloud Object Storage endpoint details to align with the location of your IBM COS instance. See IBM Cloud Object Storage below to understand how this property is used.
+2.2 Open the `resource.properties` file on your local machine and update the IBM Cloud Object Storage endpoint details (if needed) to align with the location of your IBM COS instance. These endpoint details are used by our web-app when reading files from the IBM COS bucket created in Step 1 above. 
 
-Build the WAR file to deploy to IBM Cloud
+2.3 Next we'll build the WAR file that we'll later push to IBM Cloud. From a terminal window, issue the following command: 
 ```
 mvn clean install
 ```
 ### 3. Create the db schema
-Use the SQL from the `db2.ddl` file to build a db schema. Open the Db2 Warehouse on Cloud service created earlier, open the console and use the Run SQL option to build the schema. See Db2 Warehouse on IBM Cloud below for more information on our database structure.
+Use the SQL from the `db2.ddl` file to build a db schema. 
+
+3.1 Open `db2.ddl` with a text editor and copy the content. Next, open the Db2 Warehouse on Cloud service created earlier, open the console and use the Run SQL option to build the schema. 
+
+See Db2 Warehouse on IBM Cloud below for more information on our database structure.
 
 ### 4. Create an IBM COS alias
-An IBM COS instance is global and Cloud Foundry apps require a regional alias for an IBM COS service before a CF app can bind to the service. In order to bind our IBM COS service to our web-app, we'll first create a regional alias for our IBM COS service.
+An IBM COS service instance is global on IBM Cloud. Cloud Foundry apps require a regional alias for an IBM COS service before a CF app can bind to the service. 
+
+4.1 In order to bind our IBM COS service to our web-app, we'll first create a regional alias for our IBM COS service.
 
 From a terminal window, issue the following command
 ```
@@ -58,18 +64,30 @@ Replace `ALIAS_NAME` with your preferred alias name (this can be the same as the
 Replace `NAME` in the command above with the name of the IBM COS instance created in step 1 above.
  
 ### 5. Update the manifest.yml file
-Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
+The `manifest.yml` cloned earlier contains deployment values for our application. 
+ 
+5.1 Open the `manifest.yml` file in a text editor and update with the values specific to your environment. In particular, update the `manifest.yml` with the names of the IBM Cloud services created above. For IBM COS, use the ALIAS_NAME provided for the service in Step 4.1 above. 
+
+Change the application name and other values as required then save the `manifest.yml` file. 
 
 ### 6. Push the web-app to IBM Cloud
-Using the IBM Cloud CLI, push the web-app to IBM Cloud. From a terminal window or command prompt, configure the CLI to use the correct API endpoint, login to IBM Cloud then push the app.
+Using the IBM Cloud CLI, push the web-app to IBM Cloud. 
+
+6.1 From a terminal window or command prompt, configure the CLI to use the correct IBM Cloud API endpoint, login to IBM Cloud then push the app.
+
+The set of commands you'll use are as follows: 
 ```
 bx api
 bx login
 bx app push
 ```
 ### 7. Open the web-app in a browser and run
-Open the web-app in a browser with the following URL `APP URL/home`
-Select your IBM COS bucket, then click on Run
+
+7.1 Open the web-app deployed to IBM Cloud in a browser with the following URL `APP URL/home`
+
+7.2 Select your IBM COS bucket, then click on Run
+
+Once our web-app has processed all .wav files stored on IBM COS, view the data gathered in our relational data store using Db2 Warehouse on Cloud. 
 
 ---
 ## IBM Cloud Services
