@@ -29,7 +29,8 @@ Use the following steps to build our Call Analytics web-app from source and depl
 - Natural Language Understanding
 - Db2 Warehouse on Cloud
 - IBM Cloud Object Storage
-	- Note: also create an IBM COS bucket to store call recordings (.wav files) and note the associated endpoint URL
+
+1.2 After creating the IBM COS service instance, create an IBM COS bucket to store call recordings (.wav files) and note the associated endpoint URL.
 
 ### 2. Build from source
 2.1 Clone this GitHub repository to your local machine. Open a terminal window and issue the following command: 
