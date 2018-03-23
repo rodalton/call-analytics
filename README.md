@@ -14,6 +14,16 @@ Services provided by our Call Analytics web-app;
 ## Build & deploy to IBM Cloud
 Use the following steps to build our Call Analytics web-app from source and deploy to IBM Cloud.
 
+---
+**NOTE**
+
+The following software should be installed and available for use before proceeding: 
+- Git, see install instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+- Maven, see install instructions here: https://maven.apache.org/install.html
+- IBM Cloud CLI, see install instructions here: https://console.bluemix.net/docs/cli/reference/bluemix_cli/download_cli.html#download_install
+
+---
+
 ### 1. Create the required IBM Cloud services
 Create an instance of each of these services on IBM Cloud;
 - IBM Cloud Object Storage
@@ -46,8 +56,8 @@ From a terminal window, issue the following command
 bx resource service-alias-create ALIAS_NAME --instance-name NAME
 ``` 
 
-Replace ALIAS_NAME with your preferred alias name (this can be the same as the current service name). 
-Replace NAME in the command above with the name of the IBM COS instance created in step 1 above.
+Replace `ALIAS_NAME` with your preferred alias name (this can be the same as the current service name). 
+Replace `NAME` in the command above with the name of the IBM COS instance created in step 1 above.
  
 ### 5. Update the manifest.yml file
 Open the `manifest.yml` file and update. Include the names of the IBM Cloud services created above. Change the application name and other values as required.
