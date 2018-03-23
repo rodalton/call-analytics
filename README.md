@@ -1,5 +1,7 @@
 # Call Analytics with Watson
-Our Call Analytics web-app is designed to access call recordings hosted on IBM Cloud Object Storage, transcribe these calls, then provide call insights using Watson.
+Our Call Analytics web-app is designed to access call recordings hosted on IBM Cloud Object Storage, transcribe these calls, then provide call insights using Watson. 
+
+This Call Analytics web-app should be considered a reference implementation/example that requires further customisation before deployment into any production scenario. For example, you might consider creating a custom language/acoustic model to improve the quality of the Speech to Text output. You might also consider creating a custom annotator with Watson Knowledge Studio to improve Natural Language Understaning's power to 'understand' unstructured data.  
 
 Services provided by our Call Analytics web-app;
 - access .wav files (call recordings) hosted in an [IBM Cloud Object Storage](https://www.ibm.com/cloud/object-storage) bucket
