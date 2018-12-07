@@ -47,8 +47,9 @@ public class VCAPHelper {
 				System.out.println("No NLU service bound to this application");
 				return null;
 			}
-			credentials.put("username", creds.get("username").getAsString());
-			credentials.put("password", creds.get("password").getAsString());
+			credentials.put("username", "apikey");
+			credentials.put("password", creds.get("apikey").getAsString());
+			credentials.put("url", creds.get("url").getAsString());
 		} else {
 			credentials.put("username", VCAPHelper.getLocalProperties("resource.properties").getProperty("nlu_username"));
 			credentials.put("password", VCAPHelper.getLocalProperties("resource.properties").getProperty("nlu_password"));
@@ -66,8 +67,9 @@ public class VCAPHelper {
 				System.out.println("No Tone Analyzer service bound to this application");
 				return null;
 			}
-			credentials.put("username", creds.get("username").getAsString());
-			credentials.put("password", creds.get("password").getAsString());
+			credentials.put("username", "apikey");
+			credentials.put("password", creds.get("apikey").getAsString());
+			credentials.put("url", creds.get("url").getAsString());
 		} else {
 			credentials.put("username", VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_username"));
 			credentials.put("password", VCAPHelper.getLocalProperties("resource.properties").getProperty("tone_password"));
@@ -85,8 +87,9 @@ public class VCAPHelper {
 				System.out.println("No STT service bound to this application");
 				return null;
 			}
-			credentials.put("username", creds.get("username").getAsString());
-			credentials.put("password", creds.get("password").getAsString());
+			credentials.put("username", "apikey");
+			credentials.put("password", creds.get("apikey").getAsString());
+			credentials.put("url", creds.get("url").getAsString());
 		} else {
 			credentials.put("username", VCAPHelper.getLocalProperties("resource.properties").getProperty("stt_username"));
 			credentials.put("password", VCAPHelper.getLocalProperties("resource.properties").getProperty("stt_password"));

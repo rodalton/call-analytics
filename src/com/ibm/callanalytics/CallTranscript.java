@@ -70,9 +70,11 @@ public class CallTranscript {
 		Map<String, String> credentials = VCAPHelper.getSTTCreds();
 		String username = credentials.get("username").toString(); 
 		String password = credentials.get("password").toString(); 
+		String url = credentials.get("url").toString(); 
 
 		speechToTextService = new SpeechToText();
 		speechToTextService.setUsernameAndPassword(username, password);
+		speechToTextService.setEndPoint(url);
 
 		return speechToTextService; 
 	}

@@ -93,9 +93,11 @@ public class WatsonTone {
 		Map<String, String> credentials = VCAPHelper.getToneAnalyzerCreds();
 		String username = credentials.get("username").toString(); 
 		String password = credentials.get("password").toString(); 
-		
+		String url = credentials.get("url").toString(); 
+
         service = new ToneAnalyzer("2017-09-21");
         service.setUsernameAndPassword(username, password);
+        service.setEndPoint(url);
 		
 		return service; 
 	}

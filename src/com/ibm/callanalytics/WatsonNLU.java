@@ -106,10 +106,12 @@ public class WatsonNLU {
 		Map<String, String> credentials = VCAPHelper.getNLUCreds();
 		String username = credentials.get("username").toString(); 
 		String password = credentials.get("password").toString(); 
+		String url = credentials.get("url").toString(); 
 		
 		service = new NaturalLanguageUnderstanding(
 				NaturalLanguageUnderstanding.VERSION_DATE_2017_02_27,
 				username,password);
+		service.setEndPoint(url);
 		
 		return service; 
 	}
