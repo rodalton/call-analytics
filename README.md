@@ -11,7 +11,7 @@ Services provided by our Call Analytics web-app;
 - persist call analytics data to a Db2 data store using [Db2 Warehouse on IBM Cloud](https://www.ibm.com/cloud/db2-warehouse-on-cloud)
 
 ### High Level Architecture
-![alt text](https://ibm.box.com/shared/static/lgzjxw7wdy2aaz2l621csdvf5u4kgtc5.jpg "High level architecture")
+![alt text](sequence_diagram.png "High level architecture")
 
 ## Build & deploy to IBM Cloud
 Use the following steps to build our Call Analytics web-app from source and deploy to IBM Cloud.
