@@ -96,7 +96,7 @@ Once our web-app has processed all .wav files stored on IBM COS, view the data g
 
 ---
 ## IBM Cloud Services
-![alt text](https://ibm.box.com/shared/static/jwfhwkvs87vbw53peq6j78p98uc17xzk.png "Sequence Diagram")
+![alt text](sequence_diagram.png "Sequence Diagram")
 
 ### IBM Cloud Object Storage
 IBM Cloud Object Storage is used to host our call recordings. Our web-app uses the [IBM Cloud Object Storage Java SDK](https://github.com/IBM/ibm-cos-sdk-java) to access a bucket that hosts our calls.
